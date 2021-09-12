@@ -9,7 +9,10 @@ $input_num = $_POST['input_num'];
 $ope = $_POST['ope'];
 $button = $_POST['button'];
 $pre_button = $_POST['pre_button'];
+$file_handle = null;
+$messages = array();
 
+// 数値や小数点ボタンが押された時または、ボタンが押されてない時
 if (isNumBtn($button) || empty($button)) {
     if (isOpeBtn($pre_button)) {
         $pre_num = $disp_num;
@@ -23,6 +26,8 @@ if (isNumBtn($button) || empty($button)) {
     }
 
     $input_num = $disp_num;
+
+// 数値ボタン以外が押された時（演算子や記号）
 } else {
     switch ($button) {
         case 'C':
@@ -42,17 +47,54 @@ if (isNumBtn($button) || empty($button)) {
                     case '＋':
                         $disp_num = $pre_num + $disp_num;
                         if( $file_handle = fopen( FILENAME, "a")) {
-                            $data =
+                                    // 書き込むデータ作成
+                                $data = $pre_num."+".$input_num."=".$disp_num."\n";
+
+                                // 書き込み
+                                fwrite($file_handle, $data);
+
+                                // ファイル閉じる
+                                fclose($file_handle);
                         }
                         break;
                     case '−':
                         $disp_num = $pre_num - $disp_num;
+                        if( $file_handle = fopen( FILENAME, "a")) {
+                                    // 書き込むデータ作成
+                                $data = $pre_num."-".$input_num."=".$disp_num."\n";
+
+                                // 書き込み
+                                fwrite($file_handle, $data);
+
+                                // ファイル閉じる
+                                fclose($file_handle);
+                        }
                         break;
                     case '✕':
                         $disp_num = $pre_num * $disp_num;
+                        if( $file_handle = fopen( FILENAME, "a")) {
+                                    // 書き込むデータ作成
+                                $data = $pre_num."*".$input_num."=".$disp_num."\n";
+
+                                // 書き込み
+                                fwrite($file_handle, $data);
+
+                                // ファイル閉じる
+                                fclose($file_handle);
+                        }
                         break;
                     case '÷':
                         $disp_num = $pre_num / $disp_num;
+                        if( $file_handle = fopen( FILENAME, "a")) {
+                                    // 書き込むデータ作成
+                                $data = $pre_num."/".$input_num."=".$disp_num."\n";
+
+                                // 書き込み
+                                fwrite($file_handle, $data);
+
+                                // ファイル閉じる
+                                fclose($file_handle);
+                        }
                         break;
                     default:
                         break;
@@ -62,7 +104,6 @@ if (isNumBtn($button) || empty($button)) {
             $ope = $button == '＝' ? $ope : $button;
             break;
     }
-
 
 }
 
@@ -83,14 +124,15 @@ function isNumBtn($btn) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
+
     <title>Calculator</title>
 </head>
 <body>
     <h2>Calculator</h2>
     <p><?php echo convertDispNum($disp_num); ?></p>
-    <form action="calcu2.php" method="post">
+    <form action="calcu_history.php" method="post">
         <input type="hidden" name="disp_num" value="<?php echo $disp_num; ?>" />
         <input type="hidden" name="pre_num" value="<?php echo $pre_num; ?>" />
         <input type="hidden" name="input_num" value="<?php echo $input_num; ?>" />
@@ -127,5 +169,7 @@ function isNumBtn($btn) {
                 <td><button type="submit" name="button" value="＝">＝</button></td>
             </tr>
     </form>
+    <hr>
+    <a href="./calcu_history.txt" target="_blank">計算履歴</a>
 </body>
 </html>
